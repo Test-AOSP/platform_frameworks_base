@@ -411,7 +411,7 @@ public class GestureLauncherService extends SystemService {
             if (!SystemProperties.getBoolean("persist.keyguard.camera", true)) {
                 final KeyguardManager manager = (KeyguardManager) getContext().getSystemService(
                         Context.KEYGUARD_SERVICE);
-                if (manager.inKeyguardRestrictedInputMode()) {
+                if (manager.inKeyguardRestrictedInputMode() && manager.isKeyguardSecure()) {
                     return false;
                 }
             }
