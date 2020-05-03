@@ -8323,6 +8323,17 @@ public final class Settings {
         public static final String FLASHLIGHT_ENABLED = "flashlight_enabled";
 
         /**
+         * Whether the movement based lock gesture should be disabled
+         *
+         * @hide
+         */
+        public static final String MOVEMENT_BASED_LOCK_GESTURE_DISABLED =
+                "movement_based_lock_gesture_disabled";
+
+        private static final Validator MOVEMENT_BASED_LOCK_GESTURE_DISABLED_VALIDATOR =
+                BOOLEAN_VALIDATOR;
+
+        /**
          * Whether or not face unlock is allowed on Keyguard.
          * @hide
          */
@@ -9136,7 +9147,8 @@ public final class Settings {
             GLOBAL_ACTIONS_PANEL_ENABLED,
             AWARE_LOCK_ENABLED,
             AWARE_TAP_PAUSE_GESTURE_COUNT,
-            AWARE_TAP_PAUSE_TOUCH_COUNT
+            AWARE_TAP_PAUSE_TOUCH_COUNT,
+            MOVEMENT_BASED_LOCK_GESTURE_DISABLED
         };
 
         /**
@@ -9334,6 +9346,8 @@ public final class Settings {
             VALIDATORS.put(AWARE_TAP_PAUSE_GESTURE_COUNT, NON_NEGATIVE_INTEGER_VALIDATOR);
             VALIDATORS.put(AWARE_TAP_PAUSE_TOUCH_COUNT, NON_NEGATIVE_INTEGER_VALIDATOR);
             VALIDATORS.put(TAP_GESTURE, TAP_GESTURE_VALIDATOR);
+            VALIDATORS.put(MOVEMENT_BASED_LOCK_GESTURE_DISABLED,
+                    MOVEMENT_BASED_LOCK_GESTURE_DISABLED_VALIDATOR);
         }
 
         /**

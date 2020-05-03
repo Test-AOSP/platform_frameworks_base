@@ -3272,6 +3272,9 @@
          is non-interactive. -->
     <bool name="config_cameraDoubleTapPowerGestureEnabled">true</bool>
 
+    <!-- Allow the gesture to lock based on movement. -->
+    <bool name="config_movementBasedLockGestureEnabled">true</bool>
+
     <!-- Allow the gesture power + volume up to change the ringer mode while the device
          is interactive. -->
     <bool name="config_volumeHushGestureEnabled">true</bool>
