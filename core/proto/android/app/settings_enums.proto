@@ -2411,4 +2411,7 @@ enum PageId {
     // CATEGORY: SETTINGS
     // OS: Q
     SETTINGS_GESTURE_TAP = 1751;
+
+    // OPEN: Settings > System > Input & Gesture > Movement based gesture
+    SETTINGS_GESTURE_MOVEMENT_BASED_LOCK = 1752;
 }

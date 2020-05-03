@@ -7429,5 +7429,8 @@ message MetricsEvent {
     // ---- End Q Constants, all Q constants go above this line ----
     // Add new aosp constants above this line.
     // END OF AOSP CONSTANTS
+
+    // OPEN: Settings > System > Input & Gesture > Movement based gesture
+    SETTINGS_GESTURE_MOVEMENT_BASED_LOCK = 1752;
   }
 }

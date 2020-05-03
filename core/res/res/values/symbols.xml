@@ -2873,6 +2873,7 @@
   <java-symbol type="integer" name="config_cameraLiftTriggerSensorType" />
   <java-symbol type="string" name="config_cameraLiftTriggerSensorStringType" />
   <java-symbol type="bool" name="config_volumeHushGestureEnabled" />
+  <java-symbol type="bool" name="config_movementBasedLockGestureEnabled" />
 
   <java-symbol type="drawable" name="platlogo_m" />
 
