@@ -12,12 +12,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.util.Slog;
 import android.view.WindowManagerGlobal;
 
 import com.android.server.LocalServices;
+import com.android.server.wm.WindowManagerInternal;
 
 public class MovementBasedLockService extends SystemService {
     private static final boolean DBG = false;
@@ -25,6 +27,9 @@ public class MovementBasedLockService extends SystemService {
 
     /** The listener that receives the movement based lock gesture event. */
     private final MovementBasedLockEventListener mMovementBasedLockListener = new MovementBasedLockEventListener();
+
+    private PowerManager mPowerManager;
+    private WindowManagerInternal mWindowManagerInternal;
 
     private Sensor mMovementBasedLockSensor;
     private Context mContext;
@@ -49,6 +54,9 @@ public class MovementBasedLockService extends SystemService {
                 return;
             }
 
+            mWindowManagerInternal = LocalServices.getService(WindowManagerInternal.class);
+            mPowerManager = (PowerManager) mContext.getSystemService(
+                    Context.POWER_SERVICE);
             updateMovementBasedLockRegistered();
 
             mUserId = ActivityManager.getCurrentUser();
@@ -139,12 +147,18 @@ public class MovementBasedLockService extends SystemService {
               return;
             }
             if (event.sensor == mMovementBasedLockSensor) {
+                boolean keyguardLocked = mWindowManagerInternal.isKeyguardLocked();
+                boolean interactive = mPowerManager.isInteractive();
                 if (DBG) {
                     float[] values = event.values;
                     Slog.d(TAG, String.format("Received a camera launch event: " +
                             "values=[%.4f, %.4f, %.4f].", values[0], values[1], values[2]));
                 }
-                handleMovementBasedLock(event);
+                if (!keyguardLocked && interactive) {
+                    handleMovementBasedLock(event);
+                } else {
+                    if (DBG) Slog.d(TAG, "Ignoring movement based lock event");
+                }
                 return;
             }
         }
