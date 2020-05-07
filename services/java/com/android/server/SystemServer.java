@@ -1618,6 +1618,12 @@ public final class SystemServer {
                 mSystemServiceManager.startService(GestureLauncherService.class);
                 traceEnd();
             }
+
+            if (MovementBasedLockService.isMovementBasedLockEnabled(context.getResources())) {
+                traceBeginAndSlog("StartMovementBasedLock");
+                mSystemServiceManager.startService(MovementBasedLockService.class);
+                traceEnd();
+            }
             traceBeginAndSlog("StartSensorNotification");
             mSystemServiceManager.startService(SensorNotificationService.class);
             traceEnd();
