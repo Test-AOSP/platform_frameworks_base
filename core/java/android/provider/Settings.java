@@ -6294,6 +6294,14 @@ public final class Settings {
         @UnsupportedAppUsage
         public static final String LOCK_SCREEN_LOCK_AFTER_TIMEOUT = "lock_screen_lock_after_timeout";
 
+        /**
+         * This preference allows the device to be wiped after given number of failed attempts,
+         * subject to current DeviceAdmin policy limits.
+         * @hide
+         */
+        @UnsupportedAppUsage
+        public static final String LOCK_SCREEN_WIPE_AFTER_FAILED_ATTEMPTS = "lock_screen_wipe_after_failed_attempts";
+
 
         /**
          * This preference contains the string that shows for owner info on LockScreen.
