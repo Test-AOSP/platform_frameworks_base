@@ -15,10 +15,13 @@
  */
 package com.android.keyguard;
 
+import static android.provider.Settings.Secure.LOCK_SCREEN_WIPE_AFTER_FAILED_ATTEMPTS;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Rect;
 import android.metrics.LogMaker;
@@ -420,6 +423,17 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
         showDialog(null, message);
     }
 
+    private void wipeDeviceFailedUnlock() {
+        Intent intent = new Intent(Intent.ACTION_FACTORY_RESET);
+        intent.setPackage("android");
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+        intent.putExtra(Intent.EXTRA_REASON, "FailedUnlockWipe");
+        intent.putExtra(Intent.EXTRA_FORCE_FACTORY_RESET, true);
+        intent.putExtra(Intent.EXTRA_WIPE_EXTERNAL_STORAGE, true);
+        intent.putExtra(Intent.EXTRA_WIPE_ESIMS, true);
+        mContext.sendBroadcastAsUser(intent, UserHandle.SYSTEM);
+    }
+
     private void reportFailedUnlockAttempt(int userId, int timeoutMs) {
         // +1 for this time
         final int failedAttempts = mLockPatternUtils.getCurrentFailedPasswordAttempts(userId) + 1;
@@ -428,7 +442,9 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
 
         final DevicePolicyManager dpm = mLockPatternUtils.getDevicePolicyManager();
         final int failedAttemptsBeforeWipe =
-                dpm.getMaximumFailedPasswordsForWipe(null, userId);
+                android.provider.Settings.Secure.getInt(mContext.getContentResolver(),
+                        LOCK_SCREEN_WIPE_AFTER_FAILED_ATTEMPTS, 0);
+                // dpm.getMaximumFailedPasswordsForWipe(null, userId);
 
         final int remainingBeforeWipe = failedAttemptsBeforeWipe > 0 ?
                 (failedAttemptsBeforeWipe - failedAttempts)
@@ -454,6 +470,7 @@ public class KeyguardSecurityContainer extends FrameLayout implements KeyguardSe
                 // Too many attempts. The device will be wiped shortly.
                 Slog.i(TAG, "Too many unlock attempts; user " + expiringUser + " will be wiped!");
                 showWipeDialog(failedAttempts, userType);
+                wipeDeviceFailedUnlock();
             }
         }
         mLockPatternUtils.reportFailedPasswordAttempt(userId);
