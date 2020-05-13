@@ -172,9 +172,9 @@ public class MovementBasedLockService extends SystemService {
             float DEFAULT_THRESHOLD = 40f;
 
             float[] values = event.values;
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
+            float x = values[0];
+            float y = values[1];
+            float z = values[2];
             float total = (float) Math.sqrt((x * x) + (y * y) + (z * z));
 
             if (total > DEFAULT_THRESHOLD) {
