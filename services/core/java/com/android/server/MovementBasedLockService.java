@@ -99,11 +99,11 @@ public class MovementBasedLockService extends SystemService {
         SensorManager sensorManager = (SensorManager) mContext.getSystemService(
                 Context.SENSOR_SERVICE);
         mMovementBasedLockRegistered = false;
-        mMovementBasedLockSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        mMovementBasedLockSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         if (mMovementBasedLockSensor != null) {
             mMovementBasedLockRegistered = sensorManager.registerListener(mMovementBasedLockListener,
-                    mMovementBasedLockSensor, 0);
+                    mMovementBasedLockSensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
         if (DBG) Slog.d(TAG, "Linear acceleration sensor registered: " + mMovementBasedLockRegistered);
     }
@@ -151,7 +151,7 @@ public class MovementBasedLockService extends SystemService {
                 boolean interactive = mPowerManager.isInteractive();
                 if (DBG) {
                     float[] values = event.values;
-                    Slog.d(TAG, String.format("Received a camera launch event: " +
+                    Slog.d(TAG, String.format("Received a movement based lock event: " +
                             "values=[%.4f, %.4f, %.4f].", values[0], values[1], values[2]));
                 }
                 if (!keyguardLocked && interactive) {
@@ -169,15 +169,19 @@ public class MovementBasedLockService extends SystemService {
         }
 
         private void handleMovementBasedLock(SensorEvent event) {
-            float DEFAULT_THRESHOLD = 40f;
+            // To detect when phone is falling
+            final float FREEFALL_THRESHOLD = 2f;
+            // To detect when phone is being snatched
+            final float SNATCH_THRESHOLD = 40f;
 
             float[] values = event.values;
             float x = values[0];
             float y = values[1];
             float z = values[2];
-            float total = (float) Math.sqrt((x * x) + (y * y) + (z * z));
+            float movementSensorRMSValue = (float) Math.sqrt((x * x) + (y * y) + (z * z));
 
-            if (total > DEFAULT_THRESHOLD) {
+            if (movementSensorRMSValue < FREEFALL_THRESHOLD
+                    || movementSensorRMSValue > SNATCH_THRESHOLD) {
                 try {
                     WindowManagerGlobal.getWindowManagerService().lockNow(null);
                 } catch (RemoteException e) {
