@@ -169,10 +169,7 @@ public class MovementBasedLockService extends SystemService {
         }
 
         private void handleMovementBasedLock(SensorEvent event) {
-            // To detect when phone is falling
-            final float FREEFALL_THRESHOLD = 2f;
-            // To detect when phone is being snatched
-            final float SNATCH_THRESHOLD = 40f;
+            final float MOVEMENT_THRESHOLD = 45f;
 
             float[] values = event.values;
             float x = values[0];
@@ -180,8 +177,7 @@ public class MovementBasedLockService extends SystemService {
             float z = values[2];
             float movementSensorRMSValue = (float) Math.sqrt((x * x) + (y * y) + (z * z));
 
-            if (movementSensorRMSValue < FREEFALL_THRESHOLD
-                    || movementSensorRMSValue > SNATCH_THRESHOLD) {
+            if (movementSensorRMSValue > MOVEMENT_THRESHOLD) {
                 try {
                     WindowManagerGlobal.getWindowManagerService().lockNow(null);
                 } catch (RemoteException e) {
