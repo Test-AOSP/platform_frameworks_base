@@ -105,7 +105,7 @@ public class MovementBasedLockService extends SystemService {
             mMovementBasedLockRegistered = sensorManager.registerListener(mMovementBasedLockListener,
                     mMovementBasedLockSensor, SensorManager.SENSOR_DELAY_FASTEST);
         }
-        if (DBG) Slog.d(TAG, "Linear acceleration sensor registered: " + mMovementBasedLockRegistered);
+        if (DBG) Slog.d(TAG, "Accelerometer registered: " + mMovementBasedLockRegistered);
     }
 
     public static boolean isMovementBasedLockSettingEnabled(Context context, int userId) {
@@ -140,6 +140,10 @@ public class MovementBasedLockService extends SystemService {
     };
 
     private final class MovementBasedLockEventListener implements SensorEventListener {
+
+        private static final float MOVEMENT_THRESHOLD =10f;
+        private float[] gravity = new float[3];
+
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (!mMovementBasedLockRegistered) {
@@ -169,17 +173,25 @@ public class MovementBasedLockService extends SystemService {
         }
 
         private void handleMovementBasedLock(SensorEvent event) {
-            final float MOVEMENT_THRESHOLD = 45f;
+            final float alpha = 0.8f;
 
-            float[] values = event.values;
-            float x = values[0];
-            float y = values[1];
-            float z = values[2];
+            for (int i = 0; i < 3; i++) {
+                gravity[i] = alpha * gravity[i] + (1 - alpha) * event.values[i];
+            }
+
+            float x = event.values[0] - gravity[0];
+            float y = event.values[1] - gravity[1];
+            float z = event.values[2] - gravity[2];
+
             float movementSensorRMSValue = (float) Math.sqrt((x * x) + (y * y) + (z * z));
 
             if (movementSensorRMSValue > MOVEMENT_THRESHOLD) {
                 try {
                     WindowManagerGlobal.getWindowManagerService().lockNow(null);
+                    if (DBG) {
+                        Slog.d(TAG, String.format("Sensor RMS Value: %.4f",
+                                movementSensorRMSValue));
+                    }
                 } catch (RemoteException e) {
                     Slog.e(TAG, "Error while trying to lock device.");
                 }
